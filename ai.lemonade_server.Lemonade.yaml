@@ -13,6 +13,7 @@ finish-args:
   - --share=network
   - --socket=wayland
   - --socket=fallback-x11
+  - --socket=pulseaudio
   # --device=dri can't expose /dev/kfd; ROCm/HIP needs --device=all
   - --device=all
   - --talk-name=org.freedesktop.Notifications
