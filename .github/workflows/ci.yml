@@ -21,27 +21,8 @@ jobs:
 
   flatpak-build:
     name: "Verify Flatpak Build"
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-50
-      options: --privileged
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-
-      - name: Lint Manifest
-        run: flatpak-builder-lint --gha-format manifest ai.lemonade_server.Lemonade.yaml
-
-      - name: Build Flatpak
-        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
-        with:
-          manifest-path: ai.lemonade_server.Lemonade.yaml
-          cache-key: flatpak-builder-${{ github.ref_name }}
-          repository-name: flathub
-          repo-dir: repo
-          mirror-screenshots-url: https://dl.flathub.org/media
-
-      - name: Lint Repository
-        run: flatpak-builder-lint --gha-format repo repo
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build-flatpak.yml
+    with:
+      dry-run: true
