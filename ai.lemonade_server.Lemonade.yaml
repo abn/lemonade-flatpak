@@ -21,6 +21,10 @@ finish-args:
   - --filesystem=xdg-run/lemonade:rw
   - --env=WEBKIT_DISABLE_DMABUF_RENDERER=1
   - --env=LEMONADE_DISABLE_SYSTEMD_JOURNAL=1
+  - --env=X_LEMONADE_FLM_LINUX_BETA=1
+  - --env=LD_LIBRARY_PATH=/app/lib
+  - --env=FLM_CONFIG_PATH=/app/share/flm/model_list.json
+  - --env=XILINX_XRT=/app
 
 cleanup:
   - /include
@@ -36,6 +40,12 @@ modules:
   - modules/cpp-httplib.json
   - modules/libwebsockets.json
   - shared-modules/libayatana-appindicator/libayatana-appindicator-gtk3.json
+  - modules/opencl-headers.json
+  - modules/rapidjson.json
+  - modules/boost.json
+  - modules/xrt.json
+  - modules/fftw3f.json
+  - modules/fastflowlm.json
 
   - name: lemonade-cpp
     buildsystem: cmake-ninja

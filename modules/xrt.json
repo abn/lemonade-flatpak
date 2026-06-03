@@ -1,0 +1,27 @@
+{
+  "name": "xrt",
+  "buildsystem": "simple",
+  "cleanup": [
+    "/include",
+    "/lib/cmake",
+    "/lib/pkgconfig"
+  ],
+  "build-commands": [
+    "mkdir -p build_bin && ln -sf /usr/bin/cmake build_bin/cmake3",
+    "sed -i 's|xrt_add_subdirectory(python)|# xrt_add_subdirectory(python)|g' xrt/src/CMake/nativeLnx.cmake",
+    "sed -i 's|#include <sys/sdt.h>|#define STAP_PROBEV(...)\\n#define DTRACE_PROBE(...)\\n#define DTRACE_PROBE1(...)\\n#define DTRACE_PROBE2(...)|g' xrt/src/runtime_src/core/common/detail/linux/trace.h",
+    "PATH=$PWD/build_bin:$PATH cd xrt/build && ./build.sh -npu -opt -noctest -noinit -disable-werror -cmake-flags \"-DXRT_UPSTREAM_DEBIAN=ON -DCMAKE_INSTALL_LIBDIR=lib\" -install_prefix /app -j 4",
+    "cp -a xrt/build/Release/app/* /app/",
+    "install -Dm755 xrt/src/runtime_src/core/tools/xbutil2/smi_install_archive.sh /app/bin/smi_install_archive.sh",
+    "sed -i 's|if(\"${XDNA_CPACK_LINUX_PKG_FLAVOR}\" MATCHES \"debian\")|set(XDNA_CPACK_LINUX_PKG_FLAVOR \"debian\")\\nif(\"${XDNA_CPACK_LINUX_PKG_FLAVOR}\" MATCHES \"debian\")|g' CMake/pkg.cmake",
+    "mkdir build_plugin && cd build_plugin && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/app -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_PREFIX_PATH=/app -DSKIP_KMOD=ON -DBUILD_VXDNA=ON -DXRT_UPSTREAM=OFF .. && make -j4 && make install",
+    "if [ -d /app/lib64 ]; then cp -a /app/lib64/* /app/lib/ && rm -rf /app/lib64; fi"
+  ],
+  "sources": [
+    {
+      "type": "git",
+      "url": "https://github.com/amd/xdna-driver.git",
+      "commit": "23ce43b2b8e790f6dbb50d75b20c08a914e69abc"
+    }
+  ]
+}
