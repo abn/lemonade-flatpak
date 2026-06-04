@@ -35,6 +35,7 @@ modules:
   - modules/cli11.json
   - modules/cpp-httplib.json
   - modules/libwebsockets.json
+  - modules/mbedtls.json
   - shared-modules/libayatana-appindicator/libayatana-appindicator-gtk3.json
 
   - name: lemonade-cpp
@@ -61,8 +62,7 @@ modules:
       - &lemonade-source
         type: git
         url: https://github.com/lemonade-sdk/lemonade.git
-        tag: v10.6.0
-        commit: 7af26f75c0f993a598af0a5191d992f4adf6a51a
+        commit: 1c877b481584a96167da69105368ad670135a5ba  # main
         disable-lfs: true
       - type: patch
         path: 0001-fix-app-store-settings-under-user-config-dir.patch
