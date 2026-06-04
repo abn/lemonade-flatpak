@@ -1,0 +1,7 @@
+{
+  "ai.lemonade_server.Lemonade": {
+    "module-rapidjson-source-git-branch": {
+      "linter-error": "project does not provide tagged releases since 2016"
+    }
+  }
+}

@@ -32,7 +32,7 @@ jobs:
           submodules: true
 
       - name: Lint Manifest
-        run: flatpak-builder-lint --gha-format manifest ai.lemonade_server.Lemonade.yaml
+        run: flatpak-builder-lint --exceptions --user-exceptions exceptions.json --gha-format manifest ai.lemonade_server.Lemonade.yaml
 
       - name: Build Flatpak
         uses: flatpak/flatpak-github-actions/flatpak-builder@v6
