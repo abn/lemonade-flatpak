@@ -9,7 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: publish
     permissions:
-      contents: write
+      contents: read
+      packages: write
+      pages: write
+      id-token: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -66,12 +69,8 @@ jobs:
       packages: write
       pages: write
       id-token: write
-    uses: aetherpak/actions/.github/workflows/publish.yml@v3
+    uses: ./.github/workflows/build-flatpak.yml
     with:
-      manifest-path: ai.lemonade_server.Lemonade.yaml
-      branch: stable
-      run-linter: true
-      index-template: .github/workflows/templates/lemonade.html
-      arches: x86_64
+      dry-run: false
     secrets:
       gpg-private-key: ${{ secrets.AETHERPAK_GPG_KEY }}
