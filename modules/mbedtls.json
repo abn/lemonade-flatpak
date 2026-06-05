@@ -1,0 +1,20 @@
+{
+  "name": "mbedtls",
+  "buildsystem": "cmake-ninja",
+  "config-opts": [
+    "-DENABLE_PROGRAMS=OFF",
+    "-DENABLE_TESTING=OFF",
+    "-DGEN_FILES=OFF",
+    "-DMBEDTLS_FATAL_WARNINGS=OFF",
+    "-DUSE_SHARED_MBEDTLS_LIBRARY=ON",
+    "-DUSE_STATIC_MBEDTLS_LIBRARY=OFF"
+  ],
+  "cleanup": [ "/include", "/lib/cmake", "/lib/pkgconfig" ],
+  "sources": [
+    {
+      "type": "archive",
+      "url": "https://github.com/Mbed-TLS/mbedtls/releases/download/mbedtls-3.6.6/mbedtls-3.6.6.tar.bz2",
+      "sha256": "8fb65fae8dcae5840f793c0a334860a411f884cc537ea290ce1c52bb64ca007a"
+    }
+  ]
+}
