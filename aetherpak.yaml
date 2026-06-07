@@ -1,5 +1,6 @@
 index_template: .github/workflows/templates/lemonade.html
 remote_name: lemonade
+pages_url: https://lemonade-sdk.github.io/flatpak
 
 apps:
   - id: ai.lemonade_server.Lemonade
