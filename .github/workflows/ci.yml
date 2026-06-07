@@ -17,7 +17,7 @@ jobs:
           submodules: true
 
       - name: Run Tests
-        run: make test
+        run: make -C ai.lemonade_server.Lemonade test
 
   flatpak-build:
     name: "Verify Flatpak Build"
@@ -25,4 +25,5 @@ jobs:
       contents: read
     uses: ./.github/workflows/build-flatpak.yml
     with:
+      branch: beta
       dry-run: true
