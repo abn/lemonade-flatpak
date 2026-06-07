@@ -22,6 +22,10 @@ on:
         description: "Public URL of the flatpak repository landing page."
         value: ${{ jobs.build.outputs.pages-url }}
 
+concurrency:
+  group: build-flatpak-${{ inputs.dry-run && github.run_id || 'live' }}
+  cancel-in-progress: false
+
 jobs:
   build:
     name: "Build and Deploy"
