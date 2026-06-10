@@ -5,12 +5,18 @@ oci_repository: lemonade-sdk/flatpak
 branding:
   index_template: .github/workflows/templates/lemonade.html
 
+defaults:
+  remotes:
+    amd-npu: https://abn.github.io/flatpaks-amd-npu/amd-npu.flatpakrepo
+    lemonade: https://lemonade-sdk.github.io/flatpak/lemonade.flatpakrepo
+
 apps:
   - id: ai.lemonade_server.Lemonade
-    branch: stable
     arches:
       - x86_64
       - aarch64
     manifest: ai.lemonade_server.Lemonade/ai.lemonade_server.Lemonade.yaml
-    builder_args:
-      - --install-deps-from=flathub
+  - id: ai.lemonade_server.Lemonade.backends.fastflowlm
+    arches:
+      - x86_64
+    manifest: ai.lemonade_server.Lemonade.backends.fastflowlm/ai.lemonade_server.Lemonade.backends.fastflowlm.yaml
