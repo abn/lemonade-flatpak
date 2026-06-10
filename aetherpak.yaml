@@ -4,6 +4,10 @@ pages_url: https://lemonade-sdk.github.io/flatpak
 branding:
   index_template: .github/workflows/templates/lemonade.html
 
+defaults:
+  remotes:
+    amd-npu: https://abn.github.io/flatpaks-amd-npu/amd-npu.flatpakrepo
+
 apps:
   - id: ai.lemonade_server.Lemonade
     branch: stable

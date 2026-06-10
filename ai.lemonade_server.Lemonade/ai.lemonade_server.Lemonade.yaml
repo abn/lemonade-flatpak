@@ -7,6 +7,7 @@ command: lemonade-supervisor
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.rust-stable
   - org.freedesktop.Sdk.Extension.node24
+  - org.freedesktop.Sdk.Extension.xrt
 
 finish-args:
   - --share=ipc
@@ -22,13 +23,34 @@ finish-args:
   - --env=WEBKIT_DISABLE_DMABUF_RENDERER=1
   - --env=LEMONADE_DISABLE_SYSTEMD_JOURNAL=1
 
+build-options:
+  no-debuginfo: true
+
 cleanup:
   - /include
   - /lib/pkgconfig
   - /lib/cmake
   - /share/man
+  - /extensions/backends/*/include
+  - /extensions/backends/*/lib/pkgconfig
+  - /extensions/backends/*/lib/cmake
+  - /extensions/backends/*/share/man
   - '*.a'
   - '*.la'
+
+add-extensions:
+  ai.lemonad_server.Lemonade.backends:
+    directory: extensions/backends
+    subdirectories: true
+    no-autodownload: true
+    autodelete: true
+  ai.lemonad_server.Lemonade.backends.fastflowlm:
+    directory: extensions/backends/fastflowlm
+    bundle: true
+    no-autodownload: true
+    autodelete: true
+    download-if: have-kernel-module-amdxdna
+    enable-if: have-kernel-module-amdxdna
 
 modules:
   - modules/nlohmann-json.json
@@ -36,6 +58,9 @@ modules:
   - modules/cpp-httplib.json
   - modules/libwebsockets.json
   - modules/mbedtls.json
+  - modules/backends/fastflowlm/boost.yaml
+  - modules/backends/fastflowlm/fftw3f.yaml
+  - modules/backends/fastflowlm/fastflowlm.yaml
   - shared-modules/libayatana-appindicator/libayatana-appindicator-gtk3.json
 
   - name: lemonade-cpp
@@ -97,6 +122,7 @@ modules:
     buildsystem: simple
     build-commands:
       - install -Dm755 lemonade-supervisor.sh /app/bin/lemonade-supervisor
+      - ls -all /app/extensions/backends || true
     sources:
       - type: file
         path: lemonade-supervisor.sh
@@ -114,3 +140,4 @@ modules:
       - type: file
         path: ai.lemonade_server.Lemonade.appdata.xml
       - *lemonade-source
+
