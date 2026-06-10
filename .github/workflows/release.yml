@@ -3,6 +3,11 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
+      beta:
+        description: "Beta release. Build the beta branch and mark the GitHub release as a pre-release."
+        required: false
+        type: boolean
+        default: false
       app-id:
         description: "App id to rebuild."
         required: false
@@ -68,6 +73,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ steps.calver.outputs.version }}
           PAGES_URL: ${{ needs.publish.outputs.pages-url }}
+          PRERELEASE: ${{ inputs.beta }}
         run: |
           sed 's/^          //' << EOF > release_notes.md
           For installation instructions, please refer to the repository landing page:
@@ -76,7 +82,8 @@ jobs:
 
           gh release create "$TAG_NAME" \
             --title "Release $TAG_NAME" \
-            --notes-file release_notes.md
+            --notes-file release_notes.md \
+            --prerelease="$PRERELEASE"
 
   publish:
     name: "Publish to Flatpak Repo"
@@ -87,7 +94,7 @@ jobs:
       id-token: write
     uses: ./.github/workflows/build-flatpak.yml
     with:
-      branch: stable
+      branch: ${{ inputs.beta && 'beta' || 'stable' }}
       app-id: ${{ inputs.app-id }}
       reconcile-only: ${{ inputs.reconcile && inputs.app-id == '' }}
       force-all: ${{ inputs.rebuild || (!inputs.reconcile && inputs.app-id == '') }}
