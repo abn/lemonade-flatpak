@@ -281,6 +281,60 @@
       .code-flag { color: #79c0ff; }
       .code-url { color: #85e8b4; text-decoration: underline; text-underline-offset: 3px; }
     }
+
+    /* Skeleton Loader Styles */
+    .skeleton-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      pointer-events: none;
+    }
+    .skeleton-line {
+      height: 14px;
+      background: linear-gradient(90deg, var(--card-border) 25%, var(--line) 50%, var(--card-border) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite linear;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+    .skeleton-line.title {
+      height: 24px;
+      width: 40%;
+      margin-bottom: 20px;
+    }
+    .skeleton-app-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .skeleton-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      background: linear-gradient(90deg, var(--card-border) 25%, var(--line) 50%, var(--card-border) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite linear;
+      flex-shrink: 0;
+    }
+    .skeleton-app-titles {
+      flex-grow: 1;
+    }
+    .skeleton-app-title {
+      height: 18px;
+      width: 50%;
+      margin-bottom: 8px;
+    }
+    .skeleton-app-id {
+      height: 12px;
+      width: 30%;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
   </style>
 </head>
 <body>
@@ -296,72 +350,35 @@
     <section class="hero">
       <span class="eyebrow"><span class="dot"></span> Flatpak repository</span>
       <h1>Install <span class="hl">Lemonade</span> apps on Linux.</h1>
-      <div class="badges">
-        {{if .Signing.Enabled}}<span class="badge signed"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> GPG signed &amp; verified</span>{{end}}
+      <div class="badges" id="hero-badges">
+        <span class="badge signed" id="badge-signed" style="display: none;"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> GPG signed &amp; verified</span>
         <span class="badge">Remote: <code>{{.RemoteName}}</code></span>
-        {{if .Apps}}<span class="badge">{{len .Apps}} app{{if gt (len .Apps) 1}}s{{end}}</span>{{end}}
+        <span class="badge" id="apps-count-badge" style="display: none;"></span>
       </div>
     </section>
 
     <section id="setup">
       <div class="sec-head">
         <h2>Add this repository</h2>
-        <span class="hint">{{if .Signing.Enabled}}verified · one command{{else}}one command{{end}}</span>
+        <span class="hint" id="setup-hint">one command</span>
       </div>
-      <div class="card">
-        {{if .Signing.Enabled}}
-        <div class="step">
-          <span class="label"><span class="n">1</span> Add the signed repository (flatpak ≥ 1.17)</span>
-          <div class="code"><button class="copy">Copy</button><code>flatpak remote-add --user \
-  {{.RemoteName}} \
-  {{.PagesURL}}/{{.RemoteName}}.flatpakrepo</code></div>
-          <p class="note">The <code>.flatpakrepo</code> embeds the GPG key, signature lookaside, and automatically turns on <code>gpg-verify</code>.</p>
+      <div id="setup-container">
+        <!-- Skeleton for setup card -->
+        <div class="skeleton-card">
+          <div class="skeleton-line" style="width: 50%;"></div>
+          <div class="skeleton-line" style="height: 60px; border-radius: 12px; margin-top: 10px;"></div>
+          <div class="skeleton-line" style="width: 80%; margin-top: 10px;"></div>
         </div>
-        <div class="step">
-          <details style="margin-top: 6px;">
-            <summary style="cursor: pointer; color: var(--muted); font-size: 0.85rem; font-weight: 600;">Older flatpak clients (&lt; 1.17) setup instructions</summary>
-            <p class="note" style="margin-top: 8px;">Older Flatpak versions cannot read the signature lookaside from the repository file directly. Run these commands to add the repository and configure verification manually:</p>
-            <div class="code" style="margin-top: 8px;"><button class="copy">Copy</button><code>flatpak remote-add --if-not-exists --user --no-gpg-verify \
-  {{.RemoteName}} \
-  oci+{{.PagesURL}}</code></div>
-            <div class="code" style="margin-top: 8px;"><button class="copy">Copy</button><code>flatpak remote-modify --user \
-  --signature-lookaside={{.PagesURL}}/{{.Signing.Lookaside}} \
-  {{.RemoteName}}</code></div>
-          </details>
-        </div>
-        <div class="step" style="margin-top: 18px;">
-          <span class="label"><span class="n">2</span> Install an app</span>
-          <p class="note">Pick any app below, or install by ID once the remote is added.</p>
-        </div>
-        <div class="actions setup-actions">
-          <a class="btn primary" href="{{.RemoteName}}.flatpakrepo" download>Download .flatpakrepo</a>
-          <a class="btn ghost" href="index/static" target="_blank" rel="noopener">View OCI index</a>
-          <a class="btn ghost" href="{{.Signing.PublicKey}}" download>Public key</a>
-        </div>
-        {{else}}
-        <div class="step">
-          <span class="label"><span class="n">1</span> Add the remote</span>
-          <div class="code"><button class="copy">Copy</button><code>flatpak remote-add --if-not-exists --user --no-gpg-verify \
-  {{.RemoteName}} \
-  oci+{{.PagesURL}}</code></div>
-          <p class="note">This repository is unsigned, so the remote is added without GPG verification.</p>
-        </div>
-        <div class="actions setup-actions">
-          <a class="btn primary" href="{{.RemoteName}}.flatpakrepo" download>Download .flatpakrepo</a>
-          <a class="btn ghost" href="index/static" target="_blank" rel="noopener">View OCI index</a>
-        </div>
-        {{end}}
       </div>
     </section>
 
     <section id="apps">
       <div class="sec-head">
         <h2>Apps</h2>
-        {{if .Apps}}<span class="hint">{{len .Apps}} app{{if gt (len .Apps) 1}}s{{end}} · install per release</span>{{end}}
+        <span class="hint" id="apps-hint" style="display: none;"></span>
       </div>
 
-      {{if gt (len .Apps) 1}}
-      <div class="search-container" id="search-wrapper">
+      <div class="search-container" id="search-wrapper" style="display: none;">
         <div class="search-input-wrapper">
           <span class="search-icon" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -369,46 +386,21 @@
           <input type="text" id="app-search" placeholder="Search applications by name, ID, or summary..." aria-label="Search applications">
         </div>
       </div>
-      {{end}}
 
-      {{if .Apps}}
-      <div class="grid">
-        {{range .Apps}}
-        <article class="card app-card" data-app-id="{{.ID}}" data-app-name="{{.Name}}" data-app-summary="{{.Summary}}">
-          <div class="app-head">
-            <span class="app-icon" role="img" aria-label="{{.Name}} icon">🍋{{if .Icon}}<i class="ic" hidden>{{.Icon}}</i>{{end}}</span>
-            <div>
-              <div class="app-name">{{.Name}}</div>
-              <div class="app-id">{{.ID}}</div>
+      <div id="apps-container" class="grid">
+        <!-- Skeleton for apps -->
+        <div class="skeleton-card">
+          <div class="skeleton-app-header">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-app-titles">
+              <div class="skeleton-line skeleton-app-title"></div>
+              <div class="skeleton-line skeleton-app-id"></div>
             </div>
           </div>
-          {{if .Summary}}<p class="app-summary">{{.Summary}}</p>{{end}}
-          <div class="releases">
-            {{range $i, $b := .Branches}}
-            <div class="release {{if $i}}old{{end}}">
-              <div class="release-head">
-                <span class="pill primary">{{$b.Branch}}</span>
-                {{range $b.Arches}}<span class="pill">{{.}}</span>{{end}}
-                <span class="release-date">{{if $i}}{{else}}latest{{if $b.FormattedDate}} · {{end}}{{end}}{{if $b.FormattedDate}}released {{$b.FormattedDate}}{{end}}</span>
-              </div>
-              <div class="release-meta">{{formatSize $b.InstalledSize}} installed · {{formatSize $b.DownloadSize}} download{{if $b.Commit}} · {{printf "%.10s" $b.Commit}}{{end}}</div>
-              <div class="actions">
-                <a class="btn primary" href="{{$b.RefFile}}" download>Install ({{$b.Branch}})</a>
-              </div>
-              <div class="code"><button class="copy">Copy</button><code>{{$b.InstallCmd}}</code></div>
-            </div>
-            {{end}}
-          </div>
-        </article>
-        {{end}}
+          <div class="skeleton-line" style="width: 90%;"></div>
+          <div class="skeleton-line" style="width: 70%;"></div>
+        </div>
       </div>
-      {{else}}
-      <div class="card empty">
-        <span class="mark" aria-hidden="true">🍋</span>
-        <h3>No apps published yet</h3>
-        <p>Once a build is published to this repository, its apps appear here automatically.</p>
-      </div>
-      {{end}}
     </section>
   </main>
 
@@ -424,36 +416,65 @@
   </footer>
 
   <script>
-    // Icons are data: URIs carried as hidden text because html/template sanitizes
-    // them out of src/url() contexts. Hydrate as a background once the image loads.
-    document.querySelectorAll('.app-icon .ic').forEach(function (ic) {
-      var src = ic.textContent.trim();
-      var el = ic.parentElement;
-      if (!src) return;
-      var probe = new Image();
-      probe.onload = function () {
-        el.textContent = '';
-        el.style.backgroundImage = 'url("' + src + '")';
-      };
-      probe.src = src;
-    });
+    var remoteName = '{{.RemoteName}}';
+    var pagesUrl = '{{.PagesURL}}';
 
-    document.querySelectorAll('.copy').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var code = btn.parentElement.querySelector('code');
-        if (!code || !navigator.clipboard) return;
-        // Copy raw text content without HTML tags or formatting
-        navigator.clipboard.writeText(code.textContent).then(function () {
-          var prev = btn.innerHTML;
-          btn.innerHTML = '✓ Copied';
-          btn.classList.add('ok');
-          setTimeout(function () {
-            btn.innerHTML = prev;
-            btn.classList.remove('ok');
-          }, 1400);
-        });
+    function copyCmd(btn) {
+      var container = btn.closest('.code');
+      if (!container || !navigator.clipboard) return;
+      var code = container.querySelector('code');
+      if (!code) return;
+      navigator.clipboard.writeText(code.textContent).then(function () {
+        var prev = btn.innerHTML;
+        btn.innerHTML = '✓ Copied';
+        btn.classList.add('ok');
+        setTimeout(function () {
+          btn.innerHTML = prev;
+          btn.classList.remove('ok');
+        }, 1400);
       });
-    });
+    }
+
+    function fmtSize(bytes) {
+      if (!bytes || isNaN(bytes)) return '0 B';
+      var bytesNum = parseInt(bytes, 10);
+      const unit = 1024;
+      if (bytesNum < unit) return bytesNum + ' B';
+      var div = unit, exp = 0;
+      for (var n = Math.floor(bytesNum / unit); n >= unit; n = Math.floor(n / unit)) {
+        div *= unit;
+        exp++;
+      }
+      var units = ['KB', 'MB', 'GB', 'TB'];
+      var val = bytesNum / div;
+      if (val < 10) {
+        return val.toFixed(1) + ' ' + units[exp];
+      }
+      return val.toFixed(0) + ' ' + units[exp];
+    }
+
+    function fmtDate(ts) {
+      if (!ts || isNaN(ts)) return '';
+      var d = new Date(parseInt(ts, 10) * 1000);
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function appMeta(xml) {
+      try {
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(xml, 'application/xml');
+        var pick = function (sel) {
+          var els = Array.from(doc.querySelectorAll(sel));
+          var fallback = els[0] ? els[0].textContent : undefined;
+          var noLang = els.find(function (x) { return !x.getAttribute('xml:lang'); });
+          return noLang ? noLang.textContent : fallback;
+        };
+        return { name: pick('component > name'), summary: pick('component > summary') };
+      } catch (e) {
+        return {};
+      }
+    }
 
     // CLI Command Syntax Highlighting
     function esc(s) { return String(s).replace(/[&<>"']/g, function(c) { return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; }); }
@@ -474,16 +495,267 @@
       return htmlStr;
     }
 
-    document.querySelectorAll('.code code').forEach(function (el) {
-      el.innerHTML = highlightCmd(el.textContent);
-    });
+    function renderSetup(signing) {
+      var setupContainer = document.getElementById('setup-container');
+      var setupHint = document.getElementById('setup-hint');
+      var badgeSigned = document.getElementById('badge-signed');
+      
+      var isSigned = signing && signing.enabled;
+      
+      if (isSigned) {
+        badgeSigned.style.display = 'inline-flex';
+        setupHint.textContent = 'verified · one command';
+        
+        var publicKeyUrl = signing.publicKey;
+        var lookaside = signing.lookaside;
+        
+        var verifiedCmd = 'flatpak remote-add --user \\\n  ' + remoteName + ' \\\n  ' + pagesUrl + '/' + remoteName + '.flatpakrepo';
+        var legacyCmd = 'flatpak remote-add --if-not-exists --user --no-gpg-verify \\\n  ' + remoteName + ' \\\n  oci+' + pagesUrl;
+        var modifyCmd = 'flatpak remote-modify --user \\\n  --signature-lookaside=' + pagesUrl + '/' + lookaside + ' \\\n  ' + remoteName;
+        
+        var html = '<div class="card">' +
+          '<div class="step">' +
+            '<span class="label"><span class="n">1</span> Add the signed repository (flatpak ≥ 1.17)</span>' +
+            '<div class="code"><button class="copy" onclick="copyCmd(this)">Copy</button><code>' + highlightCmd(verifiedCmd) + '</code></div>' +
+            '<p class="note">The <code>.flatpakrepo</code> embeds the GPG key, signature lookaside, and automatically turns on <code>gpg-verify</code>.</p>' +
+          '</div>' +
+          '<div class="step">' +
+            '<details style="margin-top: 6px;">' +
+              '<summary style="cursor: pointer; color: var(--muted); font-size: 0.85rem; font-weight: 600;">Older flatpak clients (&lt; 1.17) setup instructions</summary>' +
+              '<p class="note" style="margin-top: 8px;">Older Flatpak versions cannot read the signature lookaside from the repository file directly. Run these commands to add the repository and configure verification manually:</p>' +
+              '<div class="code" style="margin-top: 8px;"><button class="copy" onclick="copyCmd(this)">Copy</button><code>' + highlightCmd(legacyCmd) + '</code></div>' +
+              '<div class="code" style="margin-top: 8px;"><button class="copy" onclick="copyCmd(this)">Copy</button><code>' + highlightCmd(modifyCmd) + '</code></div>' +
+            '</details>' +
+          '</div>' +
+          '<div class="step" style="margin-top: 18px;">' +
+            '<span class="label"><span class="n">2</span> Install an app</span>' +
+            '<p class="note">Pick any app below, or install by ID once the remote is added.</p>' +
+          '</div>' +
+          '<div class="actions setup-actions">' +
+            '<a class="btn primary" href="' + remoteName + '.flatpakrepo" download>Download .flatpakrepo</a>' +
+            '<a class="btn ghost" href="index/static" target="_blank" rel="noopener">View OCI index</a>' +
+            '<a class="btn ghost" href="' + publicKeyUrl + '" download>Public key</a>' +
+          '</div>' +
+        '</div>';
+        setupContainer.innerHTML = html;
+      } else {
+        setupHint.textContent = 'one command';
+        var legacyCmd = 'flatpak remote-add --if-not-exists --user --no-gpg-verify \\\n  ' + remoteName + ' \\\n  oci+' + pagesUrl;
+        
+        var html = '<div class="card">' +
+          '<div class="step">' +
+            '<span class="label"><span class="n">1</span> Add the remote</span>' +
+            '<div class="code"><button class="copy" onclick="copyCmd(this)">Copy</button><code>' + highlightCmd(legacyCmd) + '</code></div>' +
+            '<p class="note">This repository is unsigned, so the remote is added without GPG verification.</p>' +
+          '</div>' +
+          '<div class="actions setup-actions">' +
+            '<a class="btn primary" href="' + remoteName + '.flatpakrepo" download>Download .flatpakrepo</a>' +
+            '<a class="btn ghost" href="index/static" target="_blank" rel="noopener">View OCI index</a>' +
+          '</div>' +
+        '</div>';
+        setupContainer.innerHTML = html;
+      }
+    }
 
-    // Search and filter logic
-    var searchInput = document.getElementById('app-search');
-    if (searchInput) {
+    function renderApps(data) {
+      var appsContainer = document.getElementById('apps-container');
+      var appsHint = document.getElementById('apps-hint');
+      var appsCountBadge = document.getElementById('apps-count-badge');
+      var searchWrapper = document.getElementById('search-wrapper');
+
+      var results = data.Results || [];
+      var apps = {};
+
+      results.forEach(function (res) {
+        (res.Images || []).forEach(function (img) {
+          var L = img.Labels || {};
+          var ref = L['org.flatpak.ref'];
+          if (!ref || !L['org.flatpak.metadata']) return;
+
+          var parts = ref.split('/');
+          if (parts.length < 4) return;
+
+          var id = parts[1];
+          var arch = parts[2];
+          var branch = parts[3];
+
+          var ts = 0;
+          if (L['org.flatpak.timestamp']) {
+            ts = parseInt(L['org.flatpak.timestamp'], 10);
+          }
+          var isize = 0;
+          if (L['org.flatpak.installed-size']) {
+            isize = parseInt(L['org.flatpak.installed-size'], 10);
+          }
+          var dsize = 0;
+          if (L['org.flatpak.download-size']) {
+            dsize = parseInt(L['org.flatpak.download-size'], 10);
+          }
+          var commit = L['org.flatpak.commit'] || '';
+
+          var a = apps[id];
+          if (!a) {
+            var meta = appMeta(L['org.freedesktop.appstream.appdata'] || '');
+            var name = meta.name || id.split('.').pop();
+            var summary = meta.summary || '';
+            var icon = L['org.freedesktop.appstream.icon-64'] || '';
+
+            a = apps[id] = {
+              id: id,
+              name: name,
+              summary: summary,
+              icon: icon,
+              branches: {}
+            };
+          } else {
+            // Backfill metadata if a subsequent image has richer information
+            if (a.name === id || a.summary === '') {
+              var meta = appMeta(L['org.freedesktop.appstream.appdata'] || '');
+              if (meta.name && meta.name !== id) {
+                a.name = meta.name;
+                a.summary = meta.summary || '';
+              }
+            }
+            if (!a.icon) {
+              a.icon = L['org.freedesktop.appstream.icon-64'] || '';
+            }
+          }
+
+          var b = a.branches[branch];
+          if (!b) {
+            b = a.branches[branch] = {
+              branch: branch,
+              arches: new Set(),
+              timestamp: ts,
+              installedSize: isize,
+              downloadSize: dsize,
+              commit: commit
+            };
+          }
+          b.arches.add(arch);
+          if (ts > b.timestamp) {
+            b.timestamp = ts;
+            b.installedSize = isize;
+            b.downloadSize = dsize;
+            b.commit = commit;
+          }
+        });
+      });
+
+      var ids = Object.keys(apps).sort();
+
+      // Show search bar only if there is more than 1 application
+      if (ids.length > 1) {
+        searchWrapper.style.display = 'block';
+        setupSearch();
+      } else {
+        searchWrapper.style.display = 'none';
+      }
+
+      if (ids.length === 0) {
+        appsHint.style.display = 'none';
+        appsCountBadge.style.display = 'none';
+        appsContainer.innerHTML = '<div class="card empty">' +
+          '<span class="mark" aria-hidden="true">🍋</span>' +
+          '<h3>No apps published yet</h3>' +
+          '<p>Once a build is published to this repository, its apps appear here automatically.</p>' +
+        '</div>';
+        return;
+      }
+
+      // Update badges & hints
+      appsCountBadge.textContent = ids.length + ' app' + (ids.length > 1 ? 's' : '');
+      appsCountBadge.style.display = 'inline-flex';
+      appsHint.textContent = ids.length + ' app' + (ids.length > 1 ? 's' : '') + ' · install per release';
+      appsHint.style.display = 'inline';
+
+      var cardsHTML = '';
+
+      ids.forEach(function (id) {
+        var app = apps[id];
+        
+        var iconHTML = '🍋';
+        if (app.icon) {
+          iconHTML = '<img src="' + esc(app.icon) + '" alt="" style="width: 100%; height: 100%; object-fit: contain;">';
+        }
+
+        var summaryHTML = '';
+        if (app.summary) {
+          summaryHTML = '<p class="app-summary">' + esc(app.summary) + '</p>';
+        }
+
+        var sortedBranches = Object.values(app.branches).sort(function (a, b) {
+          return b.timestamp - a.timestamp;
+        });
+
+        var releasesHTML = '';
+        sortedBranches.forEach(function (b, index) {
+          var isLatest = index === 0;
+          var releaseClass = isLatest ? '' : 'old';
+          
+          var archesArray = Array.from(b.arches).sort();
+          var archesHTML = '';
+          archesArray.forEach(function (a) {
+            archesHTML += '<span class="pill">' + esc(a) + '</span>';
+          });
+
+          var dateStr = fmtDate(b.timestamp);
+          var dateHTML = '';
+          if (isLatest) {
+            dateHTML += 'latest';
+            if (dateStr) dateHTML += ' · ';
+          }
+          if (dateStr) {
+            dateHTML += 'released ' + dateStr;
+          }
+
+          var sizeMeta = fmtSize(b.installedSize) + ' installed · ' + fmtSize(b.downloadSize) + ' download';
+          if (b.commit) {
+            sizeMeta += ' · ' + esc(b.commit.slice(0, 10));
+          }
+
+          var refFile = 'refs/' + app.id + '-' + b.branch.replace(/\//g, '-') + '.flatpakref';
+          var installCmd = 'flatpak install --user ' + remoteName + ' ' + app.id + '//' + b.branch;
+
+          releasesHTML += '<div class="release ' + releaseClass + '">' +
+            '<div class="release-head">' +
+              '<span class="pill primary">' + esc(b.branch) + '</span>' +
+              archesHTML +
+              '<span class="release-date">' + dateHTML + '</span>' +
+            '</div>' +
+            '<div class="release-meta">' + sizeMeta + '</div>' +
+            '<div class="actions">' +
+              '<a class="btn primary" href="' + esc(refFile) + '" download>Install (' + esc(b.branch) + ')</a>' +
+            '</div>' +
+            '<div class="code"><button class="copy" onclick="copyCmd(this)">Copy</button><code>' + highlightCmd(installCmd) + '</code></div>' +
+          '</div>';
+        });
+
+        cardsHTML += '<article class="card app-card" data-app-id="' + esc(app.id) + '" data-app-name="' + esc(app.name) + '" data-app-summary="' + esc(app.summary) + '">' +
+          '<div class="app-head">' +
+            '<span class="app-icon" role="img" aria-label="' + esc(app.name) + ' icon">' + iconHTML + '</span>' +
+            '<div>' +
+              '<div class="app-name">' + esc(app.name) + '</div>' +
+              '<div class="app-id">' + esc(app.id) + '</div>' +
+            '</div>' +
+          '</div>' +
+          summaryHTML +
+          '<div class="releases">' +
+            releasesHTML +
+          '</div>' +
+        '</article>';
+      });
+
+      appsContainer.innerHTML = cardsHTML;
+    }
+
+    function setupSearch() {
+      var searchInput = document.getElementById('app-search');
+      if (!searchInput) return;
+
       searchInput.addEventListener('input', function (e) {
         var query = e.target.value.toLowerCase().trim();
-        var cards = document.querySelectorAll('.grid > .app-card');
+        var cards = document.querySelectorAll('#apps-container > .app-card');
         var visibleCount = 0;
 
         cards.forEach(function (card) {
@@ -507,7 +779,7 @@
             emptySearch.className = 'card empty';
             emptySearch.style.marginTop = '1.5rem';
             emptySearch.innerHTML = '<span class="mark" aria-hidden="true">🍋</span><h3>No matching applications</h3><p>Try searching for a different keyword or app ID.</p>';
-            document.querySelector('.grid').appendChild(emptySearch);
+            document.getElementById('apps-container').appendChild(emptySearch);
           }
         } else {
           if (emptySearch) emptySearch.remove();
@@ -522,6 +794,28 @@
         }
       });
     }
+
+    Promise.all([
+      fetch('sigs/signing.json').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; }),
+      fetch('index/static').then(function(r) { if (!r.ok) throw new Error('load'); return r.json(); })
+    ]).then(function(results) {
+      var signing = results[0];
+      var data = results[1];
+      
+      renderSetup(signing);
+      renderApps(data);
+    }).catch(function(err) {
+      console.error(err);
+      var appsContainer = document.getElementById('apps-container');
+      var searchWrapper = document.getElementById('search-wrapper');
+      if (searchWrapper) searchWrapper.style.display = 'none';
+      if (appsContainer) {
+        appsContainer.innerHTML = '<div class="card empty" style="border-color:#ef4444;color:#f87171;">' +
+          '<h3>Failed to load repository</h3>' +
+          '<p>Ensure index/static exists and is accessible.</p>' +
+        '</div>';
+      }
+    });
   </script>
 </body>
 </html>
