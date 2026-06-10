@@ -226,6 +226,61 @@
         padding: 12px 42px 12px 12px;
       }
     }
+
+    /* Search Bar styling */
+    .search-container {
+      margin-top: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      color: var(--muted);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-input-wrapper input {
+      width: 100%;
+      padding: 12px 16px 12px 44px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      color: var(--ink);
+      font-family: var(--font);
+      font-size: 0.95rem;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .search-input-wrapper input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(252, 216, 70, 0.25);
+    }
+
+    /* CLI Command Syntax Highlighting */
+    .code-keyword { color: #005cc5; font-weight: 600; }
+    .code-subcommand { color: #d73a49; }
+    .code-flag { color: #e36209; }
+    .code-url { color: #22863a; text-decoration: underline; text-underline-offset: 3px; }
+
+    @media (prefers-color-scheme: dark) {
+      .code-keyword { color: #c9d1d9; font-weight: 600; }
+      .code-subcommand { color: #ff7b72; }
+      .code-flag { color: #79c0ff; }
+      .code-url { color: #85e8b4; text-decoration: underline; text-underline-offset: 3px; }
+    }
   </style>
 </head>
 <body>
@@ -256,14 +311,25 @@
       <div class="card">
         {{if .Signing.Enabled}}
         <div class="step">
-          <span class="label"><span class="n">1</span> Add the signed remote (flatpak ≥ 1.17)</span>
+          <span class="label"><span class="n">1</span> Add the signed repository (flatpak ≥ 1.17)</span>
           <div class="code"><button class="copy">Copy</button><code>flatpak remote-add --user \
-  --signature-lookaside={{.PagesURL}}/{{.Signing.Lookaside}} \
   {{.RemoteName}} \
   {{.PagesURL}}/{{.RemoteName}}.flatpakrepo</code></div>
-          <p class="note">The <code>.flatpakrepo</code> embeds the GPG key and turns on <code>gpg-verify</code>; the lookaside flag completes signature verification in the same command.</p>
+          <p class="note">The <code>.flatpakrepo</code> embeds the GPG key, signature lookaside, and automatically turns on <code>gpg-verify</code>.</p>
         </div>
         <div class="step">
+          <details style="margin-top: 6px;">
+            <summary style="cursor: pointer; color: var(--muted); font-size: 0.85rem; font-weight: 600;">Older flatpak clients (&lt; 1.17) setup instructions</summary>
+            <p class="note" style="margin-top: 8px;">Older Flatpak versions cannot read the signature lookaside from the repository file directly. Run these commands to add the repository and configure verification manually:</p>
+            <div class="code" style="margin-top: 8px;"><button class="copy">Copy</button><code>flatpak remote-add --if-not-exists --user --no-gpg-verify \
+  {{.RemoteName}} \
+  oci+{{.PagesURL}}</code></div>
+            <div class="code" style="margin-top: 8px;"><button class="copy">Copy</button><code>flatpak remote-modify --user \
+  --signature-lookaside={{.PagesURL}}/{{.Signing.Lookaside}} \
+  {{.RemoteName}}</code></div>
+          </details>
+        </div>
+        <div class="step" style="margin-top: 18px;">
           <span class="label"><span class="n">2</span> Install an app</span>
           <p class="note">Pick any app below, or install by ID once the remote is added.</p>
         </div>
@@ -272,10 +338,6 @@
           <a class="btn ghost" href="index/static" target="_blank" rel="noopener">View OCI index</a>
           <a class="btn ghost" href="{{.Signing.PublicKey}}" download>Public key</a>
         </div>
-        <p class="note" style="margin-top:14px;">Adding the repository through a software center can't carry the signature lookaside. After a GUI add, enable verification once:</p>
-        <div class="code"><button class="copy">Copy</button><code>flatpak remote-modify --user \
-  --signature-lookaside={{.PagesURL}}/{{.Signing.Lookaside}} \
-  {{.RemoteName}}</code></div>
         {{else}}
         <div class="step">
           <span class="label"><span class="n">1</span> Add the remote</span>
@@ -297,10 +359,22 @@
         <h2>Apps</h2>
         {{if .Apps}}<span class="hint">{{len .Apps}} app{{if gt (len .Apps) 1}}s{{end}} · install per release</span>{{end}}
       </div>
+
+      {{if gt (len .Apps) 1}}
+      <div class="search-container" id="search-wrapper">
+        <div class="search-input-wrapper">
+          <span class="search-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </span>
+          <input type="text" id="app-search" placeholder="Search applications by name, ID, or summary..." aria-label="Search applications">
+        </div>
+      </div>
+      {{end}}
+
       {{if .Apps}}
       <div class="grid">
         {{range .Apps}}
-        <article class="card">
+        <article class="card app-card" data-app-id="{{.ID}}" data-app-name="{{.Name}}" data-app-summary="{{.Summary}}">
           <div class="app-head">
             <span class="app-icon" role="img" aria-label="{{.Name}} icon">🍋{{if .Icon}}<i class="ic" hidden>{{.Icon}}</i>{{end}}</span>
             <div>
@@ -368,6 +442,7 @@
       btn.addEventListener('click', function () {
         var code = btn.parentElement.querySelector('code');
         if (!code || !navigator.clipboard) return;
+        // Copy raw text content without HTML tags or formatting
         navigator.clipboard.writeText(code.textContent).then(function () {
           var prev = btn.innerHTML;
           btn.innerHTML = '✓ Copied';
@@ -379,6 +454,74 @@
         });
       });
     });
+
+    // CLI Command Syntax Highlighting
+    function esc(s) { return String(s).replace(/[&<>"']/g, function(c) { return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; }); }
+
+    function highlightCmd(cmd) {
+      var htmlStr = esc(cmd);
+      var urls = [];
+      htmlStr = htmlStr.replace(/((?:oci\+)?https?:\/\/[^\s\\]+|sigs\/[^\s\\]+)/g, function(match) {
+        urls.push(match);
+        return '__AETHERPAK_URL_PLACEHOLDER_' + (urls.length - 1) + '__';
+      });
+      htmlStr = htmlStr.replace(/(^|\s)(--?[a-zA-Z0-9-]+)/g, '$1<span class="code-flag">$2</span>');
+      htmlStr = htmlStr.replace(/(^|\s)(flatpak)\b/g, '$1<span class="code-keyword">$2</span>');
+      htmlStr = htmlStr.replace(/\b(install|remote-add|remote-modify)\b/g, '<span class="code-subcommand">$1</span>');
+      for (var i = 0; i < urls.length; i++) {
+        htmlStr = htmlStr.replace('__AETHERPAK_URL_PLACEHOLDER_' + i + '__', '<span class="code-url">' + urls[i] + '</span>');
+      }
+      return htmlStr;
+    }
+
+    document.querySelectorAll('.code code').forEach(function (el) {
+      el.innerHTML = highlightCmd(el.textContent);
+    });
+
+    // Search and filter logic
+    var searchInput = document.getElementById('app-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', function (e) {
+        var query = e.target.value.toLowerCase().trim();
+        var cards = document.querySelectorAll('.grid > .app-card');
+        var visibleCount = 0;
+
+        cards.forEach(function (card) {
+          var name = card.getAttribute('data-app-name').toLowerCase();
+          var id = card.getAttribute('data-app-id').toLowerCase();
+          var summary = (card.getAttribute('data-app-summary') || '').toLowerCase();
+
+          if (name.indexOf(query) !== -1 || id.indexOf(query) !== -1 || summary.indexOf(query) !== -1) {
+            card.style.display = 'block';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        var emptySearch = document.getElementById('empty-search');
+        if (visibleCount === 0) {
+          if (!emptySearch) {
+            emptySearch = document.createElement('div');
+            emptySearch.id = 'empty-search';
+            emptySearch.className = 'card empty';
+            emptySearch.style.marginTop = '1.5rem';
+            emptySearch.innerHTML = '<span class="mark" aria-hidden="true">🍋</span><h3>No matching applications</h3><p>Try searching for a different keyword or app ID.</p>';
+            document.querySelector('.grid').appendChild(emptySearch);
+          }
+        } else {
+          if (emptySearch) emptySearch.remove();
+        }
+      });
+
+      // Focus search input when "/" is pressed
+      document.addEventListener('keydown', function (e) {
+        if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          searchInput.focus();
+        }
+      });
+    }
   </script>
 </body>
 </html>
