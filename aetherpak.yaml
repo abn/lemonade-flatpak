@@ -1,5 +1,6 @@
 remote_name: lemonade
 pages_url: https://lemonade-sdk.github.io/flatpak
+oci_repository: lemonade-sdk/flatpak
 
 branding:
   index_template: .github/workflows/templates/lemonade.html
