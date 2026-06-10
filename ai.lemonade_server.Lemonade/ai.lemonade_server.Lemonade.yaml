@@ -14,7 +14,7 @@ finish-args:
   - --socket=wayland
   - --socket=fallback-x11
   - --socket=pulseaudio
-  # --device=dri can't expose /dev/kfd; ROCm/HIP needs --device=all
+  # --device=dri can't expose /dev/accel/accel0, /dev/kfd (Flatpak < 1.8)
   - --device=all
   - --talk-name=org.freedesktop.Notifications
   - --talk-name=org.kde.StatusNotifierWatcher
@@ -22,13 +22,41 @@ finish-args:
   - --env=WEBKIT_DISABLE_DMABUF_RENDERER=1
   - --env=LEMONADE_DISABLE_SYSTEMD_JOURNAL=1
 
+build-options:
+  strip: true
+  no-debuginfo: true
+
 cleanup:
   - /include
   - /lib/pkgconfig
   - /lib/cmake
   - /share/man
+  # we do this here for any bundled extensions
+  - /extensions/backends/*/include
+  - /extensions/backends/*/lib/pkgconfig
+  - /extensions/backends/*/lib/cmake
+  - /extensions/backends/*/share/man
   - '*.a'
   - '*.la'
+
+cleanup-commands:
+  - install -d ${FLATPAK_DEST}/extensions/backends
+  - install -d ${FLATPAK_DEST}/extensions/backends/fastflowlm
+
+add-extensions:
+  ai.lemonade_server.Lemonade.backends:
+    directory: extensions/backends
+    subdirectories: true
+    no-autodownload: true
+    autodelete: true
+  ai.lemonade_server.Lemonade.backends.fastflowlm:
+    version: stable;beta
+    directory: extensions/backends/fastflowlm
+    bundle: false
+    no-autodownload: true
+    autodelete: true
+    download-if: have-kernel-module-amdxdna
+    enable-if: have-kernel-module-amdxdna
 
 modules:
   - modules/nlohmann-json.json
