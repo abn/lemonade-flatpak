@@ -5,6 +5,23 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Flatpak branch to use for build."
+        required: false
+        type: string
+        default: "beta"
+      app-id:
+        description: "Verify only this app id."
+        required: false
+        type: string
+        default: ""
+      rebuild:
+        description: "Force all apps to be rebuilt."
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   test:
@@ -25,5 +42,7 @@ jobs:
       contents: read
     uses: ./.github/workflows/build-flatpak.yml
     with:
-      branch: beta
+      branch: ${{ inputs.branch || 'beta' }}
+      app-id: ${{ inputs.app-id || '' }}
+      force-all: ${{ inputs.rebuild || false }}
       dry-run: true
