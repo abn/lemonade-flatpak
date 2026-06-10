@@ -10,6 +10,17 @@ DATA_ROOT="${LEMONADE_DATA_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/lemonade}"
 case "$HOST" in 0.0.0.0|::|"") CONNECT=127.0.0.1 ;; *) CONNECT="$HOST" ;; esac
 HEALTH="http://$CONNECT:$PORT/api/v1/health"
 
+# Wire any installed backend extension (extensions/backends/<name>) onto the
+# environment so the server can discover and launch it.
+for d in /app/extensions/backends/*/; do
+  [ -d "$d" ] || continue
+  d="${d%/}"
+  [ -d "$d/bin" ] && export PATH="$d/bin:$PATH"
+  [ -d "$d/lib" ] && export LD_LIBRARY_PATH="$d/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+  # a backend bundling the XRT runtime (e.g. FastFlowLM/NPU) ships lib/xrt
+  [ -e "$d/lib/xrt" ] && export XILINX_XRT="$d"
+done
+
 # second launch / deep link: forward to the running app, then exit
 LOCK="$XDG_RUNTIME_DIR/app/$FLATPAK_ID/supervisor.lock"
 mkdir -p "$(dirname "$LOCK")"
