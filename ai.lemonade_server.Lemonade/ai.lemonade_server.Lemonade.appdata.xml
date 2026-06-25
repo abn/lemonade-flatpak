@@ -47,6 +47,11 @@
     <category>Utility</category>
   </categories>
   <releases>
+    <release version="10.8.1" date="2026-06-25">
+      <description>
+        <p>Adds support for draft checkpoints (Gemma-4 MTP models), restores Radeon GPU support, and implements more resilient, crash-safe backend installations.</p>
+      </description>
+    </release>
     <release version="10.8.0" date="2026-06-17">
       <description>
         <p>Adds cloud offload, Moonshine speech-to-text, and MCP integration, expands CUDA/ROCm hardware support, and introduces model pinning to prevent auto-eviction.</p>
