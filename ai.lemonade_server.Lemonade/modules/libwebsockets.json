@@ -18,8 +18,8 @@
     {
       "type": "git",
       "url": "https://github.com/warmcat/libwebsockets.git",
-      "tag": "v4.3.5",
-      "commit": "ab9df9cfc39de7a49967f18387b6b76310947442"
+      "tag": "v4.5.8",
+      "commit": "fbb0baf6af9c4324f0f1591734c78b0089b599d4"
     }
   ]
 }

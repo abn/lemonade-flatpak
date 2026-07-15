@@ -61,6 +61,7 @@ add-extensions:
     enable-if: have-kernel-module-amdxdna
 
 modules:
+  - modules/libdrm.json
   - modules/nlohmann-json.json
   - modules/cli11.json
   - modules/cpp-httplib.json

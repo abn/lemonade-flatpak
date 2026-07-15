@@ -24,8 +24,8 @@
     {
       "type": "git",
       "url": "https://github.com/yhirose/cpp-httplib.git",
-      "tag": "v0.26.0",
-      "commit": "89c932f313c6437c38f2982869beacc89c2f2246"
+      "tag": "v0.50.1",
+      "commit": "62d899feac3cf9215a55f2b43da250fdd98d2156"
     }
   ]
 }

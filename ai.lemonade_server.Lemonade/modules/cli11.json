@@ -12,8 +12,8 @@
     {
       "type": "git",
       "url": "https://github.com/CLIUtils/CLI11.git",
-      "tag": "v2.4.2",
-      "commit": "6c7b07a878ad834957b98d0f9ce1dbe0cb204fc9"
+      "tag": "v2.6.2",
+      "commit": "37bb6edc5317e99af72ef48405e65d9ca5218861"
     }
   ]
 }
