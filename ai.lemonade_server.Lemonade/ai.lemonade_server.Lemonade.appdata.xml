@@ -47,6 +47,11 @@
     <category>Utility</category>
   </categories>
   <releases>
+    <release version="11.0.0" date="2026-07-15">
+      <description>
+        <p>Introduces major new capabilities including 3D generation, Text-to-Speech, ModelScope support, alongside smart model routing and significant security and hardware enhancements.</p>
+      </description>
+    </release>
     <release version="10.10.0" date="2026-07-08">
       <description>
         <p>Adds audio generation via ThinkSound/ACE-Step backends, local model file reporting endpoints, systemd-logind suspend inhibition during Linux inference, and improved ROCm hardware targeting on hybrid GPU systems.</p>
