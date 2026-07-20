@@ -83,7 +83,7 @@ modules:
         type: git
         url: https://github.com/lemonade-sdk/lemonade.git
         branch: GUI3_merging
-        commit: dc3d984d567d03fa6aa6dc57d7ba9743b62b9ccb
+        commit: 2a155349a8e0d633a582a0171771b29f35b0b3c5
         disable-lfs: true
       - type: patch
         path: 0001-fix-app-store-settings-under-user-config-dir.patch
