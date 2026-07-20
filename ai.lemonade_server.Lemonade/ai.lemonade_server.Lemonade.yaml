@@ -83,7 +83,7 @@ modules:
         type: git
         url: https://github.com/lemonade-sdk/lemonade.git
         branch: GUI3_merging
-        commit: 35090083a3f02fbb7fe19cf59d6cb240d7a24410
+        commit: a81e9271294d9f653a59ac00827b4ac8fb128d32
         disable-lfs: true
       - type: patch
         path: 0001-fix-app-store-settings-under-user-config-dir.patch
@@ -112,6 +112,8 @@ modules:
         path: 0001-fix-app-store-settings-under-user-config-dir.patch
       - type: patch
         path: 0002-flatpak-tauri-identifier-matches-flatpak-app-id.patch
+      - type: patch
+        path: 0003-gui3-fix-titlebar-drag-and-dropdown-theme-colors.patch
       - generated-node-sources.json
       - generated-cargo-sources.json
 
