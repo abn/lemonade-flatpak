@@ -47,6 +47,11 @@
     <category>Utility</category>
   </categories>
   <releases>
+    <release version="11.5.2" date="2026-08-06">
+      <description>
+        <p>Introduces HTTPS/TLS support in lemonade-tray client, preserving repeatable llama.cpp custom arguments in CLI, comprehensive hardware breakdown in lemonade bench output, and improved device error handling for llama.cpp.</p>
+      </description>
+    </release>
     <release version="11.5.1" date="2026-07-30">
       <description>
         <p>Introduces image-generation benchmarking for lemonade bench, visual routing testing in Router Builder, ten new MiniCPM models for llama.cpp, and improved support for large JSON schemas in tool-calling.</p>
